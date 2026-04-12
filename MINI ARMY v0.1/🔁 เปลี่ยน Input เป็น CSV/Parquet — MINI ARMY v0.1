@@ -1,0 +1,117 @@
+เปลี่ยน input ของ MINI ARMY v0.1 จาก JSON → CSV / Parquet
+โดยยึดหลักเดิม: Minimal / Chunk / Streaming / ไม่กิน RAM
+ฉันจะแยกให้ชัดเป็น 2 ส่วน
+1️⃣ CSV (ง่าย ใช้ได้ทันที)
+2️⃣ Parquet (เร็ว เหมาะกับข้อมูลใหญ่)
+🔁 เปลี่ยน Input เป็น CSV / Parquet — MINI ARMY v0.1
+✅ โครงสร้างไฟล์ (เพิ่มเข้าไป) 
+mini_army/
+├── ingest/
+│   ├── stream_records.py        # JSON (เดิม)
+│   ├── stream_csv.py            ✅
+│   └── stream_parquet.py        ✅
+├── aggregate/
+├── fairness/
+├── output/
+├── main_chunk.py
+└── data/
+    ├── sample.csv
+    └── sample.parquet
+
+    1️⃣ CSV Streaming Version (แนะนำเริ่มจากอันนี้)
+✅ รูปแบบ CSV ที่คาดหวัง
+session_id,origin_country,bytes_total,duration_seconds,billing_amount_usd,billing_rate_per_mib_usd,timestamp
+abc123,TH,1048576,120,0.01,0.01,2026-01-01T00:00:00Z
+
+ingest/stream_csv.py 
+# ingest/stream_csv.py
+import csv
+
+def stream_csv(path: str):
+    """
+    Generator อ่าน CSV ทีละแถว
+    ใช้ RAM ต่ำมาก
+    """
+    with open(path, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            yield {
+                "session_id": row["session_id"],
+                "origin_country": row["origin_country"],
+                "bytes_total": int(row["bytes_total"]),
+                "duration_seconds": int(row["duration_seconds"]),
+                "billing_amount_usd": float(row["billing_amount_usd"]),
+                "billing_rate_per_mib_usd": float(row["billing_rate_per_mib_usd"]),
+                "timestamp": row["timestamp"]
+            }
+
+             ✅ อ่านทีละ record
+✅ เหมาะกับไฟล์ใหญ่หลาย GB 
+ใช้กับ main_chunk.py
+เปลี่ยนแค่บรรทัดเดียว:                                      from ingest.stream_csv import stream_csv as stream_records
+
+และเปลี่ยน path:                                        DATASET_PATH = "data/sample.csv"
+
+✅ logic ที่เหลือ ไม่ต้องแก้เลย 
+2️⃣ Parquet Streaming Version (เร็วกว่า / production-friendly)
+เหมาะเมื่อ:
+•ข้อมูล ≥ 1M records
+•ต้องการ I/O เร็ว
+•ใช้ analytic pipeline
+ติดตั้ง dependency (ครั้งเดียว)
+pip install pyarrow
+
+ingest/stream_parquet.py 
+# ingest/stream_parquet.py
+import pyarrow.parquet as pq
+
+def stream_parquet(path: str, batch_size: int = 10_000):
+    """
+    อ่าน Parquet แบบ batch
+    เร็ว + ใช้ RAM ต่ำ
+    """
+    parquet_file = pq.ParquetFile(path)
+
+    for batch in parquet_file.iter_batches(batch_size=batch_size):
+        table = batch.to_pydict()
+        size = len(table["session_id"])
+
+        for i in range(size):
+            yield {
+                "session_id": table["session_id"][i],
+                "origin_country": table["origin_country"][i],
+                "bytes_total": table["bytes_total"][i],
+                "duration_seconds": table["duration_seconds"][i],
+                "billing_amount_usd": table["billing_amount_usd"][i],
+                "billing_rate_per_mib_usd": table["billing_rate_per_mib_usd"][i],
+                "timestamp": table["timestamp"][i]
+            }
+
+             ✅ เร็วกว่า CSV
+✅ เหมาะกับ stress test / production 
+ใช้กับ main_chunk.py 
+from ingest.stream_parquet import stream_parquet as stream_records
+
+DATASET_PATH = "data/sample.parquet"
+
+3️⃣ เปรียบเทียบ CSV vs Parquet (ตัดสินใจง่าย ๆ) 
+เรื่อง| CSV| Parquet
+อ่านง่าย| ✅| ❌
+ขนาดไฟล์| ใหญ่| เล็ก
+ความเร็ว| ปานกลาง| ✅✅✅
+Streaming| ✅| ✅
+เหมาะกับ| เริ่มต้น| production
+
+คำแนะนำตรง ๆ
+•v0.1 / ทดลอง → CSV
+•stress / scale → Parquet
+4️⃣ สรุปให้ตรงเหตุแห่งการสร้างสรรค์ (ตามที่คุณถามก่อนหน้า)
+“ระบบที่ยุติธรรม ต้องไม่กินทรัพยากรมากกว่าที่จำเป็น”
+•JSON → พิสูจน์แนวคิด
+•CSV → ใช้งานจริง
+•Parquet → ยืนระยะ
+ตอนนี้ MINI ARMY:
+•✅ รันได้
+•✅ scale ได้
+•✅ ไม่หลงอุดมการณ์
+ 
