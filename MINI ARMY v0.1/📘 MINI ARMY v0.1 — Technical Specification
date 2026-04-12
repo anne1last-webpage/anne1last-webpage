@@ -69,8 +69,9 @@ usage_mib = bytes_total / 1_048_576
 recomputed_billing = usage_mib × billing_rate_per_mib_usd
 7. การตรวจสอบความถูกต้อง (Validation Rules)
 7.1 Billing Delta
-คำนวณdelta
-delta = |billing_amount_usd - recomputed_billi7.2 เกณฑ์
+คำนวณ: 
+delta = |billing_amount_usd - recomputed_billi 
+7.2 เกณฑ์ 
 •delta ≤ epsilon → ผ่าน
 •delta > epsilon → violation
 ค่าเริ่มต้น:
