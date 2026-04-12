@@ -1,7 +1,4 @@
 ![16367](https://github.com/user-attachments/assets/7703e084-0f27-4a89-b0ac-83c020abdd38) 
-![16369](https://github.com/user-attachments/assets/df866366-fcfa-4566-94b0-bb9da7620b4c) 
-
-
  
  # MINI ARMY v0.1 
 
