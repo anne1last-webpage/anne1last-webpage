@@ -1,0 +1,120 @@
+1. วัตถุประสงค์ (Objectives)
+การทดสอบประสิทธิภาพมีเป้าหมายเพื่อ:
+1.ยืนยันว่า MINI ARMY v0.1
+สามารถประมวลผลข้อมูลจำนวนมากได้อย่างเสถียร
+2.ตรวจสอบพฤติกรรมของระบบเมื่อโหลดเพิ่มขึ้น (stress)
+3.ระบุคอขวด (bottleneck) ด้าน CPU, Memory และเวลา
+4.ยืนยันว่าตรรกะด้าน fairness / billing validation
+ยังคงถูกต้องภายใต้โหลดสูง
+2. ขอบเขตการทดสอบ (Test Scope)
+✅ รวมอยู่ในขอบเขต
+•Batch processing
+•JSON-based input
+•Single-node execution
+•Python runtime (CPython)
+❌ ไม่รวม
+•Distributed system
+•Real-time streaming
+•External dependencies (DB, Kafka)
+3. Test Environment (อ้างอิง)
+ค่าเหล่านี้เป็นตัวอย่าง สามารถปรับได้
+•OS: Linux / macOS / Windows
+•CPU: ≥ 4 cores
+•RAM: ≥ 8 GB
+•Python: 3.10+
+•Disk: SSD (แนะนำ)
+4. ชุดข้อมูลทดสอบ (Test Datasets)
+4.1 ขนาดข้อมูล (Record Count)
+ชื่อชุด| จำนวน record| วัตถุประสงค์
+Small| 10,000| sanity + baseline
+Medium| 100,000| performance
+Large| 1,000,000| stress test
+Extreme| 5,000,000+| memory limit test
+
+4.2 ลักษณะข้อมูล
+•distribution ของ origin_country อย่างน้อย 10 ประเทศ
+•bytes_total กระจายตั้งแต่ KB → GB
+•มี record ที่ billing ถูกต้องและผิดปะปนกัน
+5. Metrics ที่ต้องวัด (Key Metrics)
+5.1 Performance Metrics
+Metric| คำอธิบาย
+Throughput| records / second
+Total runtime| เวลาในการประมวลผลทั้ง batch
+CPU utilization| % CPU ระหว่างรัน
+Peak memory usage| RAM สูงสุดที่ใช้
+GC overhead| เวลาเสียไปกับ garbage collection
+
+5.2 Functional Integrity Metrics
+Metric| คำอธิบาย
+Billing violations count| จำนวน record ที่ delta > epsilon
+False positive rate| billing ถูกแต่โดน flag
+Recompute accuracy| ความสอดคล้องของ billing ใหม่
+Aggregation correctness| ผลรวม/ค่าเฉลี่ยตรงตามที่คาด
+
+6. Test Scenarios
+6.1 Baseline Performance Test
+วัตถุประสงค์: วัดประสิทธิภาพปกติ
+•Dataset: 10k records
+•ขั้นตอน:
+ 1.Load → Validate → Aggregate → Output
+ 2.วัดเวลาแต่ละ stage
+•Expected:
+ •Runtime < 1 วินาที
+ •ไม่มี memory spike ผิดปกติ
+6.2 Scalability Test
+วัตถุประสงค์: ดูการเติบโตของเวลา/หน่วยความจำ
+•Dataset: 10k → 100k → 1M
+•วิเคราะห์:
+ •Runtime ควรเติบโต ~ linear
+ •Memory usage ไม่ควรเติบโตเกิน O(n)
+6.3 Billing Validation Stress Test
+วัตถุประสงค์: ตรวจ fairness ภายใต้โหลดสูง
+•Dataset: ≥ 1M records
+•เงื่อนไข:
+ •5–10% ของ record มี billing ผิด
+•Expected:
+ •ระบบไม่ crash
+ •violations ถูกจับครบ
+ •epsilon ถูกใช้อย่างสม่ำเสมอ
+6.4 Memory Pressure Test
+วัตถุประสงค์: ตรวจพฤติกรรมเมื่อ RAM ใกล้เต็ม
+•Dataset: เพิ่มขนาดจน memory > 70–80%
+•ตรวจ:
+ •มี MemoryError หรือไม่
+ •ระบบ degrade แบบคาดเดาได้หรือไม่
+•Outcome:
+ •ระบุจุดที่ต้องเปลี่ยนเป็น streaming / chunking
+6.5 CPU Saturation Test
+วัตถุประสงค์: ตรวจคอขวดการคำนวณ
+•รันหลายรอบด้วย dataset เดิม
+•เปรียบเทียบ:
+ •single-thread
+ •multiprocessing (ถ้ามี)
+•Outcome:
+ •ระบุ stage ที่ CPU-bound
+7. เกณฑ์ผ่าน/ไม่ผ่าน (Acceptance Criteria)
+✅ ผ่าน เมื่อ
+•ระบบไม่ crash ในทุก test
+•ผล aggregation ถูกต้อง 100%
+•Billing violations ตรวจพบครบ
+•Runtime เติบโตแบบคาดการณ์ได้
+❌ ไม่ผ่าน เมื่อ
+•Memory leak
+•ผลรวมผิด
+•Billing validation ล้มเหลว
+•Runtime เพิ่มแบบ exponential
+8. Logging & Observability
+ระบบควร log อย่างน้อย:
+•เวลาเริ่ม / จบแต่ละ stage
+•จำนวน record ที่ประมวลผล
+•จำนวน violation
+•Peak memory / CPU (ถ้าเก็บได้)
+9. ข้อเสนอเชิงสถาปัตยกรรม (จากผลทดสอบ)
+หากพบว่า:
+•Memory สูงเกิน → เปลี่ยนเป็น chunk processing
+•CPU ตัน → vectorization / multiprocessing
+•I/O ช้า → เปลี่ยน format เป็น Parquet
+10. สรุป
+Performance Test ของ MINI ARMY
+ไม่ได้มีไว้ “โชว์ความเร็ว”
+แต่มีไว้พิสูจน์ว่า ความยุติธรรมยังอยู่ได้ภายใต้โหลดจริง
