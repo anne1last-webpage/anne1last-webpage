@@ -128,3 +128,8 @@ ng|
 •v0.4: Anomaly detection (p95/p99)
 •v1.0: Policy & Compliance layer
 
+13. สรุปสั้น (สำหรับนักพัฒนา)
+MINI ARMY v0.1
+= ระบบ batch ที่ “ไม่เชื่อ billing input”
+และยืนยันความเป็นธรรมจากข้อมูลดิบ
+
