@@ -1,0 +1,30 @@
+[
+  {
+    "session_id": "abc123",
+    "origin_country": "TH",
+    "bytes_total": 1048576,
+    "duration_seconds": 120,
+    "billing_amount_usd": 0.01,
+    "billing_rate_per_mib_usd": 0.01,
+    "timestamp": "2026-01-01T00:00:00Z"
+  },
+  {
+    "session_id": "def456",
+    "origin_country": "US",
+    "bytes_total": 2097152,
+    "duration_seconds": 240,
+    "billing_amount_usd": 0.02,
+    "billing_rate_per_mib_usd": 0.01,
+    "timestamp": "2026-01-01T01:00:00Z"
+  },
+  {
+    "session_id": "ghi789",
+    "origin_country": "JP",
+    "bytes_total": 524288,
+    "duration_seconds": 60,
+    "billing_amount_usd": 0.005,
+    "billing_rate_per_mib_usd": 0.01,
+    "timestamp": "2026-01-01T02:00:00Z"
+  }
+]
+
