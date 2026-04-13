@@ -1,0 +1,18 @@
+โครงสร้าง:
+mini_army/
+├── ingest/
+├── validate/
+├── aggregate/
+├── fairness/
+├── output/
+├── main.py
+└── sample_dataset_one_batch.json
+
+รัน:
+python main.py
+
+ผลที่ได้:
+•daily_report.json
+•summary + aggregation ตามประเทศ
+•ระบบไม่เชื่อ billing input
+✅ แค่นี้ถือว่า ระบบมีชีวิตแล้ว
