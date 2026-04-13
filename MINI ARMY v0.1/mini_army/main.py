@@ -1,0 +1,23 @@
+ตัวอย่าง main.py (เชื่อมทุกอย่างเข้าด้วยกัน)
+from ingest.load_records import load_records
+from aggregate.by_country import aggregate_by_origin
+from aggregate.daily_summary import daily_totals
+from output.report_json import write_report
+
+records = load_records("sample_dataset_one_batch.json")
+
+summary = daily_totals(records)
+by_country = aggregate_by_origin(records)
+
+report = {
+    "summary": summary,
+    "by_origin_country": by_country
+}
+
+write_report("daily_report.json", report)
+
+print("MINI ARMY v0.1 finished")
+
+✅ ตอนนี้ MINI ARMY = ระบบที่รันได้จริงแล้ว
+
+ 
