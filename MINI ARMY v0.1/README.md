@@ -67,9 +67,8 @@ MINI ARMY คือระบบต้นแบบ (prototype) สำหรับ
 
 ## 🗂 โครงสร้างโปรเจกต์ (Proposed) 
  
-  
-mini_army/ ├── ingest/ │   └── load_records.py ├── validate/ │   ├── units.py │   └── billing.py ├── aggregate/ │   ├── by_country.py │   └── daily_summary.py ├── fairness/ │   └── proportional_check.py ├── output/ │   ├── report_json.py │   └── audit_log.py └── README.md 
- 
+![16405](https://github.com/user-attachments/assets/d699283f-6201-42f1-ae11-21b442b489ef)
+
   
 --- 
  
