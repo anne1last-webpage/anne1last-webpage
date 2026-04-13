@@ -1,21 +1,17 @@
-สำหรับ MINI ARMY v0.1
-ใช้สำหรับบันทึก audit log (เช่น การตรวจสอบ, การ flag, หรือการบันทึกเหตุการณ์สำคัญ) 
+นี่คือโค้ด audit_log.py ที่บันทึกแบบ append (เพิ่มทีละบรรทัด)
+เหมาะสำหรับการบันทึก log แบบต่อเนื่อง ไม่ต้องโหลดไฟล์ทั้งหมดเข้ามาใหม่
 # output/audit_log.py
 
 import json
 from datetime import datetime
 
-def write_audit_log(path: str, log_entries: list):
+def append_audit_log(path: str, log_entry: dict):
     """
-    บันทึก audit log เป็นไฟล์ JSON
-    log_entries: list ของ dict เช่น
-      [
-        {"timestamp": "2026-04-12T17:45:00Z", "event": "violation", "session_id": "abc123", "delta": 0.0023},
-        {"timestamp": "2026-04-12T17:46:00Z", "event": "summary", "records": 1000}
-      ]
+    บันทึก log แบบ append (เพิ่มทีละบรรทัด)
+    log_entry: dict เช่น {"timestamp": "...", "event": "...", ...}
     """
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(log_entries, f, ensure_ascii=False, indent=2)
+    with open(path, 'a', encoding='utf-8') as f:
+        f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
 
 def log_violation(session_id, delta):
     return {
@@ -32,14 +28,11 @@ def log_summary(records):
         "records": records
     }
 
-วิธีใช้งาน:
-•สะสม log_entries เป็น list แล้วเรียก write_audit_log("audit_log.json", log_entries)
-•ใช้ log_violation() หรือ log_summary() เพื่อสร้าง entry
-ตัวอย่างการบันทึก:from output.audit_log import write_audit_log, log_violation, log_summary
+วิธีใช้งาน:from output.audit_log import append_audit_log, log_violation, log_summary
 
-logs = []
-logs.append(log_violation("abc123", 0.0023))
-logs.append(log_summary(1000))
+append_audit_log("audit_log.jsonl", log_violation("abc123", 0.0023))
+append_audit_log("audit_log.jsonl", log_summary(1000))
 
-write_audit_log("audit_log.json", logs)
-
+•ไฟล์จะเป็น JSON Lines (แต่ละบรรทัดคือ 1 log entry)
+•ไม่ต้องโหลดไฟล์ทั้งหมดเข้ามาใหม่
+•เหมาะกับระบบที่ต้องการ log ต่อเนื่องหรือ log ขนาดใหญ่
