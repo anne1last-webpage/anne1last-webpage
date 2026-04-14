@@ -1,0 +1,12 @@
+mini_army/
+├── ingest/
+│   ├── stream_records.py        # JSON (เดิม)
+│   ├── stream_csv.py            ✅
+│   └── stream_parquet.py        ✅
+├── aggregate/
+├── fairness/
+├── output/
+├── main_chunk.py
+└── data/
+    ├── sample.csv
+    └── sample.parquet
