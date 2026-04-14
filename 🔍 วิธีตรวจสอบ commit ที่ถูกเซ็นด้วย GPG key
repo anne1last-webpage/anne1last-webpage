@@ -1,0 +1,5 @@
+Git:git log --show-signature
+
+key นั้นเป็นของใคร:gpg --list-keys
+
+อยากดูรายละเอียด:gpg --list-keys --keyid-format LONG
