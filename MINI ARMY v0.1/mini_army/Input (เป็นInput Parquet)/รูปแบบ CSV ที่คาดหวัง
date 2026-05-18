@@ -1,2 +1,0 @@
-session_id,origin_country,bytes_total,duration_seconds,billing_amount_usd,billing_rate_per_mib_usd,timestamp
-abc123,TH,1048576,120,0.01,0.01,2026-01-01T00:00:00Z

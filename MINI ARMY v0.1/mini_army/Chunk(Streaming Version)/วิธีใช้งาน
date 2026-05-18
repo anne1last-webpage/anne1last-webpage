@@ -1,6 +1,0 @@
-python main_chunk.py
-
-ผลลัพธ์:
-•✅ ใช้ RAM คงที่ตาม CHUNK_SIZE
-•✅ รองรับ dataset ใหญ่ขึ้นหลายเท่า
-•✅ ผลลัพธ์เทียบเท่า batch ปกติ

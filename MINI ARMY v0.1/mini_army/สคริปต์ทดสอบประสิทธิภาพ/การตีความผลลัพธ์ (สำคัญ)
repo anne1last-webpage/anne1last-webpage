@@ -1,8 +1,0 @@
-ตัวอย่างผล:                                       Records processed        : 100000
-Ingest time (sec)        : 0.12
-Aggregation time (sec)  : 0.18
-Validation time (sec)   : 0.31
-Total runtime (sec)     : 0.64
-Throughput (rec/sec)    : 156,250
-Violations found        : 842
-Peak memory (MB)        : 92.4
